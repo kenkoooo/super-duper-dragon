@@ -4,6 +4,7 @@ import torch.nn as nn
 from torchvision import datasets, transforms
 import torch.nn.functional as F
 import torch.optim as optim
+from tqdm import tqdm
 
 
 class MLP(nn.Module):
@@ -24,7 +25,7 @@ def main():
     parser.add_argument("--batchsize", '-b', type=int, default=100)
     parser.add_argument("--epoch", "-e", type=int, default=20)
     parser.add_argument("--unit", "-u", default=1000, type=int)
-    parser.add_argument("--gpu", "-g", type=bool, default=False)
+    parser.add_argument("--gpu", "-g", action='store_true')
     parser.add_argument("--initmodel", "-m", default="")
     parser.add_argument("--resume", "-r", default="")
     args = parser.parse_args()
@@ -55,7 +56,7 @@ def main():
         print(f"Loading {args.resume}")
         optimizer.load_state_dict(torch.load(args.resume))
 
-    for epoch in range(1, args.epoch+1):
+    for epoch in tqdm(range(1, args.epoch+1)):
         model.train()
         sum_loss = 0
         itr = 0

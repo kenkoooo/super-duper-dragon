@@ -1,3 +1,10 @@
+.idea/
 .vscode/
 .python-version
 mnist/
+floodgate-kifu/
+
+
+#Added by cargo
+
+/target

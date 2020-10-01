@@ -54,6 +54,7 @@ def main():
         print(f"Loading {args.resume}")
         optimizer.load_state_dict(torch.load(args.resume))
 
+    entropy = nn.CrossEntropyLoss()
     pbar = tqdm(range(1, args.epoch + 1))
     for epoch in pbar:
         model.train()
@@ -63,7 +64,7 @@ def main():
             x, t = data.view(-1, 28 * 28 * 1).to(device), target.to(device)
             optimizer.zero_grad()
             y = model(x)
-            loss = nn.CrossEntropyLoss()(y, t)
+            loss = entropy(y, t)
             loss.backward()
             optimizer.step()
 

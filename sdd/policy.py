@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from constants import *
+from .constants import *
 
 CH = 192
 

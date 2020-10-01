@@ -3,7 +3,9 @@
 .python-version
 mnist/
 floodgate-kifu/
+*.pickle
 
+**/__pycache__/
 
 #Added by cargo
 

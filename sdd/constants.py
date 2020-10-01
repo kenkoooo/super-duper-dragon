@@ -1,5 +1,3 @@
-import shogi
-
 MOVE_DIRECTION = [
     UP,
     UP_LEFT,

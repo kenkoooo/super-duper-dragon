@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from torch import Tensor
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 from torchvision.transforms import ToTensor
@@ -64,7 +65,7 @@ def main():
             x, t = data.view(-1, 28 * 28 * 1).to(device), target.to(device)
             optimizer.zero_grad()
             y = model(x)
-            loss = entropy(y, t)
+            loss: Tensor = entropy(y, t)
             loss.backward()
             optimizer.step()
 
@@ -81,16 +82,16 @@ def main():
                     device
                 )
                 y_test = model(x_test)
-                sum_test_loss += nn.CrossEntropyLoss()(x_test, t_test).item()
+                sum_test_loss += entropy(y_test, t_test).item()
 
-                pred = y_test.argmax(dim=1, keepdim=True)
+                pred: Tensor = y_test.argmax(dim=1, keepdim=True)
                 sum_test_accuracy += pred.eq(t_test.view_as(pred)).sum().item()
                 test_itr += 1
 
         train_loss = sum_loss / itr
         test_loss = sum_test_loss / test_itr
         accuracy = sum_test_accuracy / test_itr
-        pbar.set_description(f"epoch={epoch} train_loss={train_loss} test_loss={test_loss} accuracy={accuracy}")
+        print(f"epoch={epoch} train_loss={train_loss} test_loss={test_loss} accuracy={accuracy}")
 
     torch.save(model.state_dict(), "./mnist/mlp.model")
     torch.save(optimizer.state_dict(), "./mnist/mlp.state")

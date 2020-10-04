@@ -74,5 +74,6 @@ fn main() -> Result<()> {
             epoch, train_loss, test_loss, accuracy
         );
     }
+
     Ok(())
 }

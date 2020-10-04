@@ -11,3 +11,4 @@ publish = false
 regex = "1"
 anyhow = "1.0.32"
 rand = "0.7.3"
+csa = "0.5.0"

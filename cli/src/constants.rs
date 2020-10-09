@@ -1,203 +1,61 @@
-pub const A9: u128 = 0;
-pub const A8: u128 = 1;
-pub const A7: u128 = 2;
-pub const A6: u128 = 3;
-pub const A5: u128 = 4;
-pub const A4: u128 = 5;
-pub const A3: u128 = 6;
-pub const A2: u128 = 7;
-pub const A1: u128 = 8;
-pub const B9: u128 = 9;
-pub const B8: u128 = 10;
-pub const B7: u128 = 11;
-pub const B6: u128 = 12;
-pub const B5: u128 = 13;
-pub const B4: u128 = 14;
-pub const B3: u128 = 15;
-pub const B2: u128 = 16;
-pub const B1: u128 = 17;
-pub const C9: u128 = 18;
-pub const C8: u128 = 19;
-pub const C7: u128 = 20;
-pub const C6: u128 = 21;
-pub const C5: u128 = 22;
-pub const C4: u128 = 23;
-pub const C3: u128 = 24;
-pub const C2: u128 = 25;
-pub const C1: u128 = 26;
-pub const D9: u128 = 27;
-pub const D8: u128 = 28;
-pub const D7: u128 = 29;
-pub const D6: u128 = 30;
-pub const D5: u128 = 31;
-pub const D4: u128 = 32;
-pub const D3: u128 = 33;
-pub const D2: u128 = 34;
-pub const D1: u128 = 35;
-pub const E9: u128 = 36;
-pub const E8: u128 = 37;
-pub const E7: u128 = 38;
-pub const E6: u128 = 39;
-pub const E5: u128 = 40;
-pub const E4: u128 = 41;
-pub const E3: u128 = 42;
-pub const E2: u128 = 43;
-pub const E1: u128 = 44;
-pub const F9: u128 = 45;
-pub const F8: u128 = 46;
-pub const F7: u128 = 47;
-pub const F6: u128 = 48;
-pub const F5: u128 = 49;
-pub const F4: u128 = 50;
-pub const F3: u128 = 51;
-pub const F2: u128 = 52;
-pub const F1: u128 = 53;
-pub const G9: u128 = 54;
-pub const G8: u128 = 55;
-pub const G7: u128 = 56;
-pub const G6: u128 = 57;
-pub const G5: u128 = 58;
-pub const G4: u128 = 59;
-pub const G3: u128 = 60;
-pub const G2: u128 = 61;
-pub const G1: u128 = 62;
-pub const H9: u128 = 63;
-pub const H8: u128 = 64;
-pub const H7: u128 = 65;
-pub const H6: u128 = 66;
-pub const H5: u128 = 67;
-pub const H4: u128 = 68;
-pub const H3: u128 = 69;
-pub const H2: u128 = 70;
-pub const H1: u128 = 71;
-pub const I9: u128 = 72;
-pub const I8: u128 = 73;
-pub const I7: u128 = 74;
-pub const I6: u128 = 75;
-pub const I5: u128 = 76;
-pub const I4: u128 = 77;
-pub const I3: u128 = 78;
-pub const I2: u128 = 79;
-pub const I1: u128 = 80;
-pub const BB_A9: u128 = 1 << A9;
-pub const BB_A8: u128 = 1 << A8;
-pub const BB_A7: u128 = 1 << A7;
-pub const BB_A6: u128 = 1 << A6;
-pub const BB_A5: u128 = 1 << A5;
-pub const BB_A4: u128 = 1 << A4;
-pub const BB_A3: u128 = 1 << A3;
-pub const BB_A2: u128 = 1 << A2;
-pub const BB_A1: u128 = 1 << A1;
-pub const BB_B9: u128 = 1 << B9;
-pub const BB_B8: u128 = 1 << B8;
-pub const BB_B7: u128 = 1 << B7;
-pub const BB_B6: u128 = 1 << B6;
-pub const BB_B5: u128 = 1 << B5;
-pub const BB_B4: u128 = 1 << B4;
-pub const BB_B3: u128 = 1 << B3;
-pub const BB_B2: u128 = 1 << B2;
-pub const BB_B1: u128 = 1 << B1;
-pub const BB_C9: u128 = 1 << C9;
-pub const BB_C8: u128 = 1 << C8;
-pub const BB_C7: u128 = 1 << C7;
-pub const BB_C6: u128 = 1 << C6;
-pub const BB_C5: u128 = 1 << C5;
-pub const BB_C4: u128 = 1 << C4;
-pub const BB_C3: u128 = 1 << C3;
-pub const BB_C2: u128 = 1 << C2;
-pub const BB_C1: u128 = 1 << C1;
-pub const BB_D9: u128 = 1 << D9;
-pub const BB_D8: u128 = 1 << D8;
-pub const BB_D7: u128 = 1 << D7;
-pub const BB_D6: u128 = 1 << D6;
-pub const BB_D5: u128 = 1 << D5;
-pub const BB_D4: u128 = 1 << D4;
-pub const BB_D3: u128 = 1 << D3;
-pub const BB_D2: u128 = 1 << D2;
-pub const BB_D1: u128 = 1 << D1;
-pub const BB_E9: u128 = 1 << E9;
-pub const BB_E8: u128 = 1 << E8;
-pub const BB_E7: u128 = 1 << E7;
-pub const BB_E6: u128 = 1 << E6;
-pub const BB_E5: u128 = 1 << E5;
-pub const BB_E4: u128 = 1 << E4;
-pub const BB_E3: u128 = 1 << E3;
-pub const BB_E2: u128 = 1 << E2;
-pub const BB_E1: u128 = 1 << E1;
-pub const BB_F9: u128 = 1 << F9;
-pub const BB_F8: u128 = 1 << F8;
-pub const BB_F7: u128 = 1 << F7;
-pub const BB_F6: u128 = 1 << F6;
-pub const BB_F5: u128 = 1 << F5;
-pub const BB_F4: u128 = 1 << F4;
-pub const BB_F3: u128 = 1 << F3;
-pub const BB_F2: u128 = 1 << F2;
-pub const BB_F1: u128 = 1 << F1;
-pub const BB_G9: u128 = 1 << G9;
-pub const BB_G8: u128 = 1 << G8;
-pub const BB_G7: u128 = 1 << G7;
-pub const BB_G6: u128 = 1 << G6;
-pub const BB_G5: u128 = 1 << G5;
-pub const BB_G4: u128 = 1 << G4;
-pub const BB_G3: u128 = 1 << G3;
-pub const BB_G2: u128 = 1 << G2;
-pub const BB_G1: u128 = 1 << G1;
-pub const BB_H9: u128 = 1 << H9;
-pub const BB_H8: u128 = 1 << H8;
-pub const BB_H7: u128 = 1 << H7;
-pub const BB_H6: u128 = 1 << H6;
-pub const BB_H5: u128 = 1 << H5;
-pub const BB_H4: u128 = 1 << H4;
-pub const BB_H3: u128 = 1 << H3;
-pub const BB_H2: u128 = 1 << H2;
-pub const BB_H1: u128 = 1 << H1;
-pub const BB_I9: u128 = 1 << I9;
-pub const BB_I8: u128 = 1 << I8;
-pub const BB_I7: u128 = 1 << I7;
-pub const BB_I6: u128 = 1 << I6;
-pub const BB_I5: u128 = 1 << I5;
-pub const BB_I4: u128 = 1 << I4;
-pub const BB_I3: u128 = 1 << I3;
-pub const BB_I2: u128 = 1 << I2;
-pub const BB_I1: u128 = 1 << I1;
+use crate::model::MoveDirection;
+use shogiutil::Piece;
 
-pub const BB_FILE_9: u128 = BB_A9 | BB_B9 | BB_C9 | BB_D9 | BB_E9 | BB_F9 | BB_G9 | BB_H9 | BB_I9;
-pub const BB_FILE_8: u128 = BB_A8 | BB_B8 | BB_C8 | BB_D8 | BB_E8 | BB_F8 | BB_G8 | BB_H8 | BB_I8;
-pub const BB_FILE_7: u128 = BB_A7 | BB_B7 | BB_C7 | BB_D7 | BB_E7 | BB_F7 | BB_G7 | BB_H7 | BB_I7;
-pub const BB_FILE_6: u128 = BB_A6 | BB_B6 | BB_C6 | BB_D6 | BB_E6 | BB_F6 | BB_G6 | BB_H6 | BB_I6;
-pub const BB_FILE_5: u128 = BB_A5 | BB_B5 | BB_C5 | BB_D5 | BB_E5 | BB_F5 | BB_G5 | BB_H5 | BB_I5;
-pub const BB_FILE_4: u128 = BB_A4 | BB_B4 | BB_C4 | BB_D4 | BB_E4 | BB_F4 | BB_G4 | BB_H4 | BB_I4;
-pub const BB_FILE_3: u128 = BB_A3 | BB_B3 | BB_C3 | BB_D3 | BB_E3 | BB_F3 | BB_G3 | BB_H3 | BB_I3;
-pub const BB_FILE_2: u128 = BB_A2 | BB_B2 | BB_C2 | BB_D2 | BB_E2 | BB_F2 | BB_G2 | BB_H2 | BB_I2;
-pub const BB_FILE_1: u128 = BB_A1 | BB_B1 | BB_C1 | BB_D1 | BB_E1 | BB_F1 | BB_G1 | BB_H1 | BB_I1;
+const PIECES: [Piece; 14] = [
+    Piece::Pawn,
+    Piece::Lance,
+    Piece::Knight,
+    Piece::Silver,
+    Piece::Gold,
+    Piece::Bishop,
+    Piece::Rook,
+    Piece::King,
+    Piece::ProPawn,
+    Piece::ProLance,
+    Piece::ProKnight,
+    Piece::ProSilver,
+    Piece::ProBishop,
+    Piece::ProRook,
+];
 
-pub const BB_RANK_A: u128 = BB_A1 | BB_A2 | BB_A3 | BB_A4 | BB_A5 | BB_A6 | BB_A7 | BB_A8 | BB_A9;
-pub const BB_RANK_B: u128 = BB_B1 | BB_B2 | BB_B3 | BB_B4 | BB_B5 | BB_B6 | BB_B7 | BB_B8 | BB_B9;
-pub const BB_RANK_C: u128 = BB_C1 | BB_C2 | BB_C3 | BB_C4 | BB_C5 | BB_C6 | BB_C7 | BB_C8 | BB_C9;
-pub const BB_RANK_D: u128 = BB_D1 | BB_D2 | BB_D3 | BB_D4 | BB_D5 | BB_D6 | BB_D7 | BB_D8 | BB_D9;
-pub const BB_RANK_E: u128 = BB_E1 | BB_E2 | BB_E3 | BB_E4 | BB_E5 | BB_E6 | BB_E7 | BB_E8 | BB_E9;
-pub const BB_RANK_F: u128 = BB_F1 | BB_F2 | BB_F3 | BB_F4 | BB_F5 | BB_F6 | BB_F7 | BB_F8 | BB_F9;
-pub const BB_RANK_G: u128 = BB_G1 | BB_G2 | BB_G3 | BB_G4 | BB_G5 | BB_G6 | BB_G7 | BB_G8 | BB_G9;
-pub const BB_RANK_H: u128 = BB_H1 | BB_H2 | BB_H3 | BB_H4 | BB_H5 | BB_H6 | BB_H7 | BB_H8 | BB_H9;
-pub const BB_RANK_I: u128 = BB_I1 | BB_I2 | BB_I3 | BB_I4 | BB_I5 | BB_I6 | BB_I7 | BB_I8 | BB_I9;
+pub const INPUT_CHANNELS: usize = PIECES.len()
+    + Piece::Pawn.max_piece_in_hand()
+    + Piece::Lance.max_piece_in_hand()
+    + Piece::Knight.max_piece_in_hand()
+    + Piece::Silver.max_piece_in_hand()
+    + Piece::Gold.max_piece_in_hand()
+    + Piece::Bishop.max_piece_in_hand()
+    + Piece::Rook.max_piece_in_hand()
+    + Piece::King.max_piece_in_hand()
+    + Piece::ProPawn.max_piece_in_hand()
+    + Piece::ProLance.max_piece_in_hand()
+    + Piece::ProKnight.max_piece_in_hand()
+    + Piece::ProSilver.max_piece_in_hand()
+    + Piece::ProBishop.max_piece_in_hand()
+    + Piece::ProRook.max_piece_in_hand();
 
-pub const BB_VOID: u128 = 0;
+pub const MOVE_DIRECTIONS: [MoveDirection; 20] = [
+    MoveDirection::Up,
+    MoveDirection::Down,
+    MoveDirection::Left,
+    MoveDirection::Right,
+    MoveDirection::UpLeft,
+    MoveDirection::UpRight,
+    MoveDirection::DownLeft,
+    MoveDirection::DownRight,
+    MoveDirection::Up2Left,
+    MoveDirection::Up2Right,
+    MoveDirection::UpPromote,
+    MoveDirection::DownPromote,
+    MoveDirection::LeftPromote,
+    MoveDirection::RightPromote,
+    MoveDirection::UpLeftPromote,
+    MoveDirection::UpRightPromote,
+    MoveDirection::DownLeftPromote,
+    MoveDirection::DownRightPromote,
+    MoveDirection::Up2LeftPromote,
+    MoveDirection::Up2RightPromote,
+];
 
-pub const NONE: u128 = 0;
-pub const PAWN: u128 = 1;
-pub const LANCE: u128 = 2;
-pub const KNIGHT: u128 = 3;
-pub const SILVER: u128 = 4;
-pub const GOLD: u128 = 5;
-pub const BISHOP: u128 = 6;
-pub const ROOK: u128 = 7;
-pub const KING: u128 = 8;
-pub const PROM_PAWN: u128 = 9;
-pub const PROM_LANCE: u128 = 10;
-pub const PROM_KNIGHT: u128 = 11;
-pub const PROM_SILVER: u128 = 12;
-pub const PROM_BISHOP: u128 = 13;
-pub const PROM_ROOK: u128 = 14;
-
-pub const BLACK: usize = 0;
-pub const WHITE: usize = 1;
+// directions + drops
+pub const MOVE_DIRECTION_LABEL_NUM: usize = MOVE_DIRECTIONS.len() + 7;

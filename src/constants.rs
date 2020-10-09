@@ -18,21 +18,16 @@ const PIECES: [Piece; 14] = [
     Piece::ProRook,
 ];
 
-pub const INPUT_CHANNELS: usize = PIECES.len()
-    + Piece::Pawn.max_piece_in_hand()
-    + Piece::Lance.max_piece_in_hand()
-    + Piece::Knight.max_piece_in_hand()
-    + Piece::Silver.max_piece_in_hand()
-    + Piece::Gold.max_piece_in_hand()
-    + Piece::Bishop.max_piece_in_hand()
-    + Piece::Rook.max_piece_in_hand()
-    + Piece::King.max_piece_in_hand()
-    + Piece::ProPawn.max_piece_in_hand()
-    + Piece::ProLance.max_piece_in_hand()
-    + Piece::ProKnight.max_piece_in_hand()
-    + Piece::ProSilver.max_piece_in_hand()
-    + Piece::ProBishop.max_piece_in_hand()
-    + Piece::ProRook.max_piece_in_hand();
+/// Pieces = 14
+/// Pieces in hand
+///     - Pawn: 18
+///     - Lance: 4
+///     - Knight: 4
+///     - Silver: 4
+///     - Gold: 4
+///     - Bishop: 2
+///     - Rook: 2
+pub const INPUT_CHANNELS: usize = 104;
 
 pub const MOVE_DIRECTIONS: [MoveDirection; 20] = [
     MoveDirection::Up,

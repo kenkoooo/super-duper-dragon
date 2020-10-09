@@ -1,15 +1,15 @@
 use anyhow::Result;
-use cli::constants::{INPUT_CHANNELS, MOVE_DIRECTIONS};
-use cli::model::{DataRow, MoveDirection};
-use cli::MoveDirection::Up2Left;
-use cli::{MoveDirection, MOVE_DIRECTIONS};
-use serde::{Deserialize, Serialize};
+use indicatif::ProgressIterator;
 use shogiutil::{parse_csa_string, Bitboard, Board, Color, Move, Piece, Square};
 use std::cmp::{max, min};
-use std::fs::read_to_string;
+use std::env;
+use std::fs::{read_to_string, File};
+use std::io::Write;
 use std::path::Path;
+use super_duper_dragon::constants::{INPUT_CHANNELS, MOVE_DIRECTIONS};
+use super_duper_dragon::model::{MoveDirection, Position};
 
-fn read_single_kifu<P: AsRef<Path>>(filepath: P) -> Result<Vec<DataRow>> {
+fn read_single_kifu<P: AsRef<Path>>(filepath: P) -> Result<Vec<Position>> {
     let content = read_to_string(filepath)?;
     let kifu = parse_csa_string(&content)?;
     let winner = kifu.winner.expect("No winner");
@@ -38,10 +38,10 @@ fn read_single_kifu<P: AsRef<Path>>(filepath: P) -> Result<Vec<DataRow>> {
         let result = board.push_move(mv.clone())?;
         let move_label = make_output_label(&mv, mv.color, result.promoted);
         let features = make_input_feature(piece_bb, occupied, pieces_in_hand);
-        data.push(DataRow {
+        data.push(Position {
             is_winner_turn,
             move_label,
-            features,
+            features: features.to_vec(),
         });
     }
     Ok(data)
@@ -74,7 +74,7 @@ fn make_input_feature(
 
         for &piece in HANDY_PIECES.iter() {
             for i in 0..piece.max_piece_in_hand() {
-                if i < pieces_in_hand[color_id][piece.to_usize()] {
+                if i < pieces_in_hand[color_id][piece.to_usize()].into() {
                     features[pos] = 0b_111111111_111111111_111111111_111111111_111111111_111111111_111111111_111111111_111111111;
                 } else {
                     features[pos] = 0;
@@ -143,4 +143,29 @@ fn make_output_label(mv: &Move, color: Color, promoted: bool) -> u8 {
     9 * 9 * direction + move_to
 }
 
-fn main() {}
+fn read_and_write(kifu_list_filepath: &str, bin_filepath: &str) -> Result<()> {
+    let mut train_data = vec![];
+    let kifu_list = read_to_string(kifu_list_filepath)?;
+    let kifu_list = kifu_list.split("\n").collect::<Vec<_>>();
+    for filepath in kifu_list.iter().progress() {
+        if filepath.is_empty() {
+            continue;
+        }
+        let data = read_single_kifu(filepath)?;
+        train_data.extend(data);
+    }
+
+    let mut file = File::create(bin_filepath)?;
+    let bin = bincode::serialize(&train_data)?;
+    file.write_all(&bin)?;
+    Ok(())
+}
+
+fn main() -> Result<()> {
+    env::set_var("RUST_LOG", "info");
+    env_logger::init();
+
+    read_and_write("./train_kifu_list.txt", "./train_kifu_list.bin")?;
+    read_and_write("./test_kifu_list.txt", "./test_kifu_list.bin")?;
+    Ok(())
+}

@@ -1,4 +1,3 @@
-use crate::constants::INPUT_CHANNELS;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -68,15 +67,14 @@ impl MoveDirection {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct DataRow {
-    pub features: [u128; INPUT_CHANNELS],
+pub struct Position {
+    pub features: Vec<u128>,
     pub is_winner_turn: bool,
     pub move_label: u8,
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::constants::MOVE_DIRECTIONS;
 
     #[test]

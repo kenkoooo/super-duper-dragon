@@ -4,6 +4,7 @@
 mnist/
 floodgate-kifu/
 *.pickle
+*.bin
 
 **/__pycache__/
 

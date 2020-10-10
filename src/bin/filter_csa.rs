@@ -7,8 +7,6 @@ use std::path::Path;
 const PATH: &str = "./floodgate-kifu/wdoor2016/2016/";
 
 struct KifuInfo<P> {
-    black_rate: f64,
-    white_rate: f64,
     path: P,
 }
 
@@ -46,11 +44,7 @@ fn load_kifu_info<P: AsRef<Path>>(kifu_path: P) -> Option<KifuInfo<P>> {
     if !is_resign || moves <= 50 || min(black_rate, white_rate) < 2500.0 {
         None
     } else {
-        Some(KifuInfo {
-            path: kifu_path,
-            black_rate,
-            white_rate,
-        })
+        Some(KifuInfo { path: kifu_path })
     }
 }
 

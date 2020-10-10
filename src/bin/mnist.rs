@@ -1,6 +1,6 @@
 use anyhow::Result;
 use tch::kind::Kind::Double;
-use tch::nn::{self, Linear, Module, ModuleT, OptimizerConfig, Path};
+use tch::nn::{self, Linear, Module, OptimizerConfig, Path};
 use tch::{no_grad, Device, Tensor};
 
 #[derive(Debug)]

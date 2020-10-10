@@ -39,6 +39,8 @@ where
         }
 
         self.count += 1;
-        Some((Tensor::of_slice(&data), Tensor::of_slice(&labels)))
+        let data = Tensor::of_slice(&data);
+        let labels = Tensor::of_slice(&labels);
+        Some((data, labels))
     }
 }

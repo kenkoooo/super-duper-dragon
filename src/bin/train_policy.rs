@@ -4,11 +4,13 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 use super_duper_dragon::constants::INPUT_CHANNELS;
+use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
+use super_duper_dragon::util::Accuracy;
 use tch::kind::Kind::{Double, Int64};
 use tch::nn::{Module, OptimizerConfig, Sgd, VarStore};
-use tch::{no_grad, Device, Tensor};
+use tch::{no_grad, Device};
 
 fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
     log::info!("Loading {}", filepath);
@@ -42,11 +44,12 @@ fn main() -> Result<()> {
         let mut sum_loss_epoch = 0.0;
         let mut iter_epoch = 0.0;
 
-        let batch_count = train_kifu.len() / batchsize;
-        for i in 0..batch_count {
-            let (x, t) = mini_batch(&train_kifu, i * batchsize, batchsize);
-            let x = x.to_device(vs.device());
-            let t = t.to_device(vs.device());
+        let train_loader = DataLoader::new(&train_kifu, position_to_features, batchsize);
+        for (x, t) in train_loader {
+            let x = x
+                .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
+                .to_device(vs.device());
+            let t = t.totype(Int64).to_device(vs.device());
             optimizer.zero_grad();
             let y = model.forward(&x);
             let loss = y.log_softmax(-1, Double).nll_loss(&t);
@@ -61,18 +64,19 @@ fn main() -> Result<()> {
                 no_grad(|| {
                     let test_batchsize = 512;
                     test_kifu.shuffle(&mut rng);
-                    let (x, t) = mini_batch(&test_kifu, 0, test_batchsize);
-                    let x = x.to_device(vs.device());
+                    let mut test_loader =
+                        DataLoader::new(&test_kifu, position_to_features, test_batchsize);
+                    let (x, t) = test_loader.next().unwrap();
+                    let x = x
+                        .view((test_batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
+                        .to_device(vs.device());
                     let t = t.to_device(vs.device());
                     let y = model.forward(&x);
-                    let pred = y.argmax(Some(1), true);
-                    let accuracy = pred.eq1(&t.view_as(&pred)).sum(Double).double_value(&[])
-                        / (test_batchsize as f64);
                     log::info!(
                         "iter_epoch={} loss={} accuracy={}",
                         iter_epoch,
                         sum_loss / iter,
-                        accuracy
+                        y.accuracy(&t)
                     );
                 });
                 sum_loss = 0.0;
@@ -84,29 +88,18 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn mini_batch(positions: &[Position], offset: usize, batchsize: usize) -> (Tensor, Tensor) {
-    let mut mini_batch_data = vec![];
-    let mut mini_batch_move = vec![];
-    for i in 0..batchsize {
-        let mut features = vec![0.0f32; 9 * 9 * INPUT_CHANNELS];
-        for (c, &feature) in positions[i + offset].features.iter().enumerate() {
-            assert!(c < INPUT_CHANNELS);
-            for i in 0..9 {
-                for j in 0..9 {
-                    let pos = i * 9 + j;
-                    if feature & (1 << pos) != 0 {
-                        features[9 * 9 * c + pos] = 1.0;
-                    }
+fn position_to_features(position: &Position) -> (Vec<f32>, u8) {
+    let mut features = vec![0.0f32; 9 * 9 * INPUT_CHANNELS];
+    for (c, &feature) in position.features.iter().enumerate() {
+        assert!(c < INPUT_CHANNELS);
+        for i in 0..9 {
+            for j in 0..9 {
+                let pos = i * 9 + j;
+                if feature & (1 << pos) != 0 {
+                    features[9 * 9 * c + pos] = 1.0;
                 }
             }
         }
-
-        mini_batch_data.extend(features);
-        mini_batch_move.push(positions[i + offset].move_label);
     }
-
-    let data_tensor =
-        Tensor::of_slice(&mini_batch_data).view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9));
-    let move_tensor = Tensor::of_slice(&mini_batch_move).totype(Int64);
-    (data_tensor, move_tensor)
+    (features, position.move_label)
 }

@@ -1,22 +1,4 @@
 use crate::model::MoveDirection;
-use shogiutil::Piece;
-
-const PIECES: [Piece; 14] = [
-    Piece::Pawn,
-    Piece::Lance,
-    Piece::Knight,
-    Piece::Silver,
-    Piece::Gold,
-    Piece::Bishop,
-    Piece::Rook,
-    Piece::King,
-    Piece::ProPawn,
-    Piece::ProLance,
-    Piece::ProKnight,
-    Piece::ProSilver,
-    Piece::ProBishop,
-    Piece::ProRook,
-];
 
 /// Pieces = 14
 /// Pieces in hand
@@ -53,4 +35,4 @@ pub const MOVE_DIRECTIONS: [MoveDirection; 20] = [
 ];
 
 // directions + drops
-pub const MOVE_DIRECTION_LABEL_NUM: usize = MOVE_DIRECTIONS.len() + 7;
+pub const MOVE_DIRECTION_LABEL_NUM: i64 = MOVE_DIRECTIONS.len() as i64 + 7;

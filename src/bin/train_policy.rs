@@ -1,4 +1,5 @@
 use anyhow::Result;
+use clap::Clap;
 use indicatif::{ProgressBar, ProgressIterator, ProgressStyle};
 use rand::prelude::*;
 use std::env;
@@ -8,10 +9,20 @@ use super_duper_dragon::constants::INPUT_CHANNELS;
 use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
-use super_duper_dragon::util::Accuracy;
+use super_duper_dragon::util::{Accuracy, CheckPoint};
 use tch::kind::Kind::{Double, Int64};
 use tch::nn::{Module, OptimizerConfig, Sgd, VarStore};
 use tch::{no_grad, Device};
+
+#[derive(Clap)]
+#[clap(version = "1.0", author = "kenkoooo <kenkou.n@gmail.com>")]
+struct Opts {
+    #[clap(short, long, default_value = "1024")]
+    batchsize: usize,
+
+    #[clap(short, long, default_value = "1000")]
+    eval_interval: usize,
+}
 
 fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
     log::info!("Loading {}", filepath);
@@ -22,13 +33,15 @@ fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
     Ok(kifu)
 }
 
+const CHECK_POINT_FILEPATH: &str = "./train_policy_check_point.bin";
+
 fn main() -> Result<()> {
     env::set_var("RUST_LOG", "info");
     env_logger::init();
+    let opts: Opts = Opts::parse();
 
     let mut rng = StdRng::seed_from_u64(717);
-    let batchsize = 32;
-    let eval_interval = 1000.0;
+    let batchsize = opts.batchsize;
 
     let train_kifu = load_bin_file("./train_kifu_list.bin")?;
     log::info!("train_data = {}", train_kifu.len());
@@ -36,8 +49,10 @@ fn main() -> Result<()> {
     let mut test_kifu = load_bin_file("./test_kifu_list.bin")?;
     log::info!("test_data = {}", test_kifu.len());
 
-    let vs = VarStore::new(Device::Cuda(0));
+    let mut vs = VarStore::new(Device::Cuda(0));
     let model = PolicyNetwork::new(&vs.root());
+    vs.load_if_exists(CHECK_POINT_FILEPATH)?;
+
     let mut optimizer = Sgd::default().build(&vs, 0.01)?;
     for _ in 0..1 {
         let mut sum_loss = 0.0;
@@ -65,9 +80,10 @@ fn main() -> Result<()> {
             sum_loss_epoch += loss.double_value(&[]);
             iter_epoch += 1.0;
 
-            if iter == eval_interval {
+            if iter as usize == opts.eval_interval {
+                vs.save(CHECK_POINT_FILEPATH)?;
                 no_grad(|| {
-                    let test_batchsize = 512;
+                    let test_batchsize = 1024;
                     test_kifu.shuffle(&mut rng);
                     let mut test_loader =
                         DataLoader::new(&test_kifu, position_to_features, test_batchsize);

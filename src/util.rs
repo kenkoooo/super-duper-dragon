@@ -1,4 +1,6 @@
+use anyhow::Result;
 use tch::kind::Kind::Double;
+use tch::nn::VarStore;
 use tch::Tensor;
 
 pub trait Accuracy {
@@ -11,5 +13,19 @@ impl Accuracy for Tensor {
         pred.eq1(&target.view_as(&pred))
             .mean(Double)
             .double_value(&[])
+    }
+}
+
+pub trait CheckPoint {
+    fn load_if_exists(&mut self, filepath: &str) -> Result<()>;
+}
+
+impl CheckPoint for VarStore {
+    fn load_if_exists(&mut self, filepath: &str) -> Result<()> {
+        if std::path::Path::new(filepath).exists() {
+            log::info!("Loading {}", filepath);
+            self.load(filepath)?;
+        }
+        Ok(())
     }
 }

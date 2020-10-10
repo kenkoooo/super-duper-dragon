@@ -1,6 +1,7 @@
 use anyhow::Result;
+use std::env;
 use tch::kind::Kind::Double;
-use tch::nn::{self, Linear, Module, OptimizerConfig, Path};
+use tch::nn::{self, Linear, Module, OptimizerConfig, Path, VarStore};
 use tch::{no_grad, Device, Tensor};
 
 #[derive(Debug)]
@@ -27,12 +28,20 @@ impl tch::nn::Module for MLP {
     }
 }
 
-fn main() -> Result<()> {
-    let m = tch::vision::mnist::load_dir("./mnist/MNIST/raw")?;
-    let vs = tch::nn::VarStore::new(Device::Cuda(0));
-    let batchsize = 100;
+const MNIST_VAR_FILE: &str = "./mnist.bin";
 
+fn main() -> Result<()> {
+    env::set_var("RUST_LOG", "info");
+    env_logger::init();
+
+    let m = tch::vision::mnist::load_dir("./mnist/MNIST/raw")?;
+    let mut vs = tch::nn::VarStore::new(Device::Cuda(0));
     let model = MLP::new(&vs.root(), 1000);
+    if std::path::Path::new(MNIST_VAR_FILE).exists() {
+        log::info!("Loading {}", MNIST_VAR_FILE);
+        vs.load(MNIST_VAR_FILE)?;
+    }
+    let batchsize = 100;
     let mut optimizer = nn::Sgd::default().build(&vs, 0.01)?;
     for epoch in 0..20 {
         let mut sum_loss = 0.0;
@@ -69,11 +78,16 @@ fn main() -> Result<()> {
         let train_loss = sum_loss / itr;
         let test_loss = sum_test_loss / test_itr;
         let accuracy = sum_test_accuracy / test_itr;
-        println!(
+        log::info!(
             "epoch={} train_loss={} test_loss={} accuracy={}",
-            epoch, train_loss, test_loss, accuracy
+            epoch,
+            train_loss,
+            test_loss,
+            accuracy
         );
     }
+
+    vs.save(MNIST_VAR_FILE)?;
 
     Ok(())
 }

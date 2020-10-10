@@ -43,4 +43,9 @@ where
         let labels = Tensor::of_slice(&labels);
         Some((data, labels))
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let size = self.data.len() / self.batchsize;
+        (size, Some(size))
+    }
 }

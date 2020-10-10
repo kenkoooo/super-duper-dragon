@@ -1,4 +1,5 @@
 use anyhow::Result;
+use indicatif::{ProgressBar, ProgressIterator, ProgressStyle};
 use rand::prelude::*;
 use std::env;
 use std::fs::File;
@@ -27,7 +28,7 @@ fn main() -> Result<()> {
 
     let mut rng = StdRng::seed_from_u64(717);
     let batchsize = 32;
-    let eval_interval = 100.0;
+    let eval_interval = 1000.0;
 
     let train_kifu = load_bin_file("./train_kifu_list.bin")?;
     log::info!("train_data = {}", train_kifu.len());
@@ -44,8 +45,12 @@ fn main() -> Result<()> {
         let mut sum_loss_epoch = 0.0;
         let mut iter_epoch = 0.0;
 
+        let progress_bar = ProgressBar::new((train_kifu.len() / batchsize) as u64);
+        progress_bar.set_style(ProgressStyle::default_bar().template(
+            "{percent} {wide_bar} {pos}/{len} [{elapsed_precise}/{eta_precise} {per_sec}] {msg}",
+        ));
         let train_loader = DataLoader::new(&train_kifu, position_to_features, batchsize);
-        for (x, t) in train_loader {
+        for (x, t) in train_loader.progress_with(progress_bar.clone()) {
             let x = x
                 .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
                 .to_device(vs.device());
@@ -72,12 +77,12 @@ fn main() -> Result<()> {
                         .to_device(vs.device());
                     let t = t.to_device(vs.device());
                     let y = model.forward(&x);
-                    log::info!(
+                    progress_bar.set_message(&format!(
                         "iter_epoch={} loss={} accuracy={}",
                         iter_epoch,
                         sum_loss / iter,
                         y.accuracy(&t)
-                    );
+                    ));
                 });
                 sum_loss = 0.0;
                 iter = 0.0;

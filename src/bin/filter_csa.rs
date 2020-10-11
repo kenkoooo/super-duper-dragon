@@ -1,10 +1,21 @@
 use anyhow::Result;
+use clap::Clap;
 use rand::prelude::{SliceRandom, StdRng};
 use rand::SeedableRng;
 use std::fs::{read_dir, read_to_string};
 use std::path::Path;
 
-const PATH: &str = "./floodgate-kifu/wdoor2016/2016/";
+#[derive(Clap)]
+#[clap(version = "1.0", author = "kenkoooo <kenkou.n@gmail.com>")]
+struct Opts {
+    #[clap(short, long)]
+    dir: String,
+
+    #[clap(long)]
+    train: String,
+    #[clap(long)]
+    test: String,
+}
 
 struct KifuInfo<P> {
     path: P,
@@ -41,7 +52,7 @@ fn load_kifu_info<P: AsRef<Path>>(kifu_path: P) -> Option<KifuInfo<P>> {
     let black_rate = black_rate?;
     let white_rate = white_rate?;
 
-    if !is_resign || moves <= 50 || min(black_rate, white_rate) < 2500.0 {
+    if !is_resign || moves <= 50 || min(black_rate, white_rate) < 3000.0 {
         None
     } else {
         Some(KifuInfo { path: kifu_path })
@@ -57,9 +68,10 @@ fn min<T: PartialOrd>(a: T, b: T) -> T {
 }
 
 fn main() -> Result<()> {
+    let opts: Opts = Opts::parse();
     let mut kifu_infos = vec![];
 
-    for entry in read_dir(PATH)? {
+    for entry in read_dir(&opts.dir)? {
         let path = entry?.path();
         if path.is_file() {
             if let Some(info) = load_kifu_info(path) {
@@ -80,14 +92,14 @@ fn main() -> Result<()> {
         train_files += train_info.path.to_str().unwrap();
         train_files += "\n";
     }
-    std::fs::write("train_kifu_list.txt", train_files)?;
+    std::fs::write(&opts.train, train_files)?;
 
     let mut test_files = String::new();
     for test_info in test {
         test_files += test_info.path.to_str().unwrap();
         test_files += "\n";
     }
-    std::fs::write("test_kifu_list.txt", test_files)?;
+    std::fs::write(&opts.test, test_files)?;
 
     Ok(())
 }

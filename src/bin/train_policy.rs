@@ -1,6 +1,5 @@
 use anyhow::Result;
 use clap::Clap;
-use indicatif::{ProgressBar, ProgressIterator, ProgressStyle};
 use rand::prelude::*;
 use std::env;
 use std::fs::File;
@@ -9,6 +8,7 @@ use super_duper_dragon::constants::INPUT_CHANNELS;
 use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
+use super_duper_dragon::progressbar::ProgressBar;
 use super_duper_dragon::util::{Accuracy, CheckPoint};
 use tch::kind::Kind::{Double, Int64};
 use tch::nn::{Module, OptimizerConfig, Sgd, VarStore};
@@ -19,9 +19,14 @@ use tch::{no_grad, Device};
 struct Opts {
     #[clap(short, long, default_value = "1024")]
     batchsize: usize,
-
-    #[clap(short, long, default_value = "1000")]
+    #[clap(short, long, default_value = "100")]
     eval_interval: usize,
+    #[clap(short, long)]
+    save_file_path: String,
+    #[clap(long)]
+    train: String,
+    #[clap(long)]
+    test: String,
 }
 
 fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
@@ -33,8 +38,6 @@ fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
     Ok(kifu)
 }
 
-const CHECK_POINT_FILEPATH: &str = "./train_policy_check_point.bin";
-
 fn main() -> Result<()> {
     env::set_var("RUST_LOG", "info");
     env_logger::init();
@@ -43,15 +46,15 @@ fn main() -> Result<()> {
     let mut rng = StdRng::seed_from_u64(717);
     let batchsize = opts.batchsize;
 
-    let train_kifu = load_bin_file("./train_kifu_list.bin")?;
+    let train_kifu = load_bin_file(&opts.train)?;
     log::info!("train_data = {}", train_kifu.len());
 
-    let mut test_kifu = load_bin_file("./test_kifu_list.bin")?;
+    let mut test_kifu = load_bin_file(&opts.test)?;
     log::info!("test_data = {}", test_kifu.len());
 
     let mut vs = VarStore::new(Device::Cuda(0));
     let model = PolicyNetwork::new(&vs.root());
-    vs.load_if_exists(CHECK_POINT_FILEPATH)?;
+    vs.load_if_exists(&opts.save_file_path)?;
 
     let mut optimizer = Sgd::default().build(&vs, 0.01)?;
     for _ in 0..1 {
@@ -60,16 +63,13 @@ fn main() -> Result<()> {
         let mut sum_loss_epoch = 0.0;
         let mut iter_epoch = 0.0;
 
-        let progress_bar = ProgressBar::new((train_kifu.len() / batchsize) as u64);
-        progress_bar.set_style(ProgressStyle::default_bar().template(
-            "{percent} {wide_bar} {pos}/{len} [{elapsed_precise}/{eta_precise} {per_sec}] {msg}",
-        ));
         let train_loader = DataLoader::new(&train_kifu, position_to_features, batchsize);
-        for (x, t) in train_loader.progress_with(progress_bar.clone()) {
+        for (x, t) in ProgressBar::new(train_loader, |state| log::info!("{}", state)) {
             let x = x
                 .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
                 .to_device(vs.device());
             let t = t.totype(Int64).to_device(vs.device());
+
             optimizer.zero_grad();
             let y = model.forward(&x);
             let loss = y.log_softmax(-1, Double).nll_loss(&t);
@@ -81,24 +81,23 @@ fn main() -> Result<()> {
             iter_epoch += 1.0;
 
             if iter as usize == opts.eval_interval {
-                vs.save(CHECK_POINT_FILEPATH)?;
+                vs.save(&opts.save_file_path)?;
                 no_grad(|| {
-                    let test_batchsize = 1024;
                     test_kifu.shuffle(&mut rng);
                     let mut test_loader =
-                        DataLoader::new(&test_kifu, position_to_features, test_batchsize);
+                        DataLoader::new(&test_kifu, position_to_features, batchsize);
                     let (x, t) = test_loader.next().unwrap();
                     let x = x
-                        .view((test_batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
+                        .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
                         .to_device(vs.device());
                     let t = t.to_device(vs.device());
                     let y = model.forward(&x);
-                    progress_bar.set_message(&format!(
+                    log::info!(
                         "iter_epoch={} loss={} accuracy={}",
                         iter_epoch,
                         sum_loss / iter,
                         y.accuracy(&t)
-                    ));
+                    );
                 });
                 sum_loss = 0.0;
                 iter = 0.0;
@@ -106,6 +105,7 @@ fn main() -> Result<()> {
         }
     }
 
+    log::info!("Done");
     Ok(())
 }
 

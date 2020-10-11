@@ -50,8 +50,9 @@ impl UsiPlayer for PolicyPlayer {
                 let output = self.model.forward(&x);
 
                 for mv in board.generate_legal_moves() {
-                    make_output_label()
+                    // make_output_label()
                 }
+                todo!()
             }
             UsiRequest::Go => vec![],
             UsiRequest::Quit => vec![],

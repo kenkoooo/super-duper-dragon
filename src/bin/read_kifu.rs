@@ -9,9 +9,7 @@ use std::path::{Path, PathBuf};
 use super_duper_dragon::constants::{INPUT_CHANNELS, MOVE_DIRECTIONS};
 use super_duper_dragon::model::{MoveDirection, Position};
 use super_duper_dragon::progressbar::ToProgressBar;
-use super_duper_dragon::util::make_input_feature::{
-    make_input_feature, make_input_feature_from_board,
-};
+use super_duper_dragon::util::board_encoder::BoardPacker;
 use super_duper_dragon::util::make_output_label::make_output_label;
 
 #[derive(Clap)]
@@ -30,10 +28,23 @@ fn read_single_kifu<P: AsRef<Path>>(filepath: P) -> Result<Vec<Position>> {
     let mut data = vec![];
     let mut board = Board::default();
     for mv in kifu.moves {
-        let features = make_input_feature_from_board(&board, mv.color);
+        let features = if mv.color == Color::Black {
+            board.encode()
+        } else {
+            board.rotate180().encode()
+        };
         let is_winner_turn = mv.color == winner;
         let result = board.push_move(mv.clone())?;
-        let move_label = make_output_label(&mv, mv.color, result.promoted);
+        let move_label = if mv.color == Color::Black {
+            make_output_label(&mv.from, &mv.to, mv.piece, result.promoted)
+        } else {
+            make_output_label(
+                &mv.from.map(|f| f.rotate()),
+                &mv.to.rotate(),
+                mv.piece,
+                result.promoted,
+            )
+        };
         data.push(Position {
             is_winner_turn,
             move_label,

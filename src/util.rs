@@ -1,4 +1,4 @@
-pub mod make_input_feature;
+pub mod board_encoder;
 pub mod make_output_label;
 
 use crate::constants::INPUT_CHANNELS;

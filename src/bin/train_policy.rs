@@ -9,7 +9,7 @@ use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
 use super_duper_dragon::progressbar::ProgressBar;
-use super_duper_dragon::util::make_input_feature::unflatten;
+use super_duper_dragon::util::board_encoder::flatten;
 use super_duper_dragon::util::{Accuracy, CheckPoint};
 use tch::kind::Kind::{Double, Int64};
 use tch::nn::{Module, OptimizerConfig, Sgd, VarStore};
@@ -111,5 +111,5 @@ fn main() -> Result<()> {
 }
 
 fn position_to_features(position: &Position) -> (Vec<f32>, u8) {
-    (unflatten(&position.features), position.move_label)
+    (flatten(&position.features), position.move_label)
 }

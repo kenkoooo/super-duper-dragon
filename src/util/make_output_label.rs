@@ -1,12 +1,12 @@
 use crate::constants::MOVE_DIRECTIONS;
 use crate::model::MoveDirection;
-use shogiutil::{Color, Move};
+use shogiutil::{Color, Move, Piece, Square};
 use std::cmp::{max, min};
 
-pub fn make_output_label(mv: &Move, color: Color, promoted: bool) -> u8 {
-    let direction = if let Some(from) = mv.from.as_ref() {
-        let dy = (mv.to.rank as i32) - (from.rank as i32);
-        let dx = (from.file as i32) - (mv.to.file as i32);
+pub fn make_output_label(from: &Option<Square>, to: &Square, piece: Piece, promoted: bool) -> u8 {
+    let direction = if let Some(from) = from.as_ref() {
+        let dy = (to.rank as i32) - (from.rank as i32);
+        let dx = (from.file as i32) - (to.file as i32);
         let direction = if dy == -2 && dx == 1 {
             MoveDirection::Up2Right
         } else if dy == -2 && dx == -1 {
@@ -23,18 +23,15 @@ pub fn make_output_label(mv: &Move, color: Color, promoted: bool) -> u8 {
             direction.to_byte()
         }
     } else {
-        let drop_id = mv.piece.to_usize() - 1;
+        let drop_id = piece.to_usize() - 1;
         let direction_id = MOVE_DIRECTIONS.len() + drop_id;
         direction_id as u8
     };
-    let move_to = if color == Color::Black {
-        (mv.to.rank - 1) * 9 + 9 - mv.to.file
-    } else {
-        (9 - mv.to.rank) * 9 + mv.to.file - 1
-    };
+    let (i, j) = to.to_pos();
+    let move_to = i * 9 + j;
     assert!(direction < 27);
     assert!(move_to < 81);
-    9 * 9 * direction + move_to
+    9 * 9 * direction + move_to as u8
 }
 
 const MOVE_DIRECTIONS_MAP: [[Option<MoveDirection>; 3]; 3] = [

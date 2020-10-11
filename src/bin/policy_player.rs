@@ -4,7 +4,7 @@ use shogiutil::{UsiRequest, UsiResponse};
 use super_duper_dragon::constants::INPUT_CHANNELS;
 use super_duper_dragon::network::policy::PolicyNetwork;
 use super_duper_dragon::usi::UsiPlayer;
-use super_duper_dragon::util::make_input_feature::{make_input_feature_from_board, unflatten};
+use super_duper_dragon::util::board_encoder::flatten;
 use super_duper_dragon::util::make_output_label::make_output_label;
 use super_duper_dragon::util::CheckPoint;
 use tch::nn::{Module, VarStore};
@@ -43,7 +43,7 @@ impl UsiPlayer for PolicyPlayer {
             UsiRequest::NewGame => vec![],
             UsiRequest::Position { board, next_turn } => {
                 let features = make_input_feature_from_board(&board, next_turn);
-                let input = unflatten(&features);
+                let input = flatten(&features);
                 let x = Tensor::of_slice(&input)
                     .view((1, INPUT_CHANNELS as i64, 9, 9))
                     .to_device(self.vs.device());

@@ -9,6 +9,7 @@ use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
 use super_duper_dragon::progressbar::ProgressBar;
+use super_duper_dragon::util::make_input_feature::unflatten;
 use super_duper_dragon::util::{Accuracy, CheckPoint};
 use tch::kind::Kind::{Double, Int64};
 use tch::nn::{Module, OptimizerConfig, Sgd, VarStore};
@@ -110,17 +111,5 @@ fn main() -> Result<()> {
 }
 
 fn position_to_features(position: &Position) -> (Vec<f32>, u8) {
-    let mut features = vec![0.0f32; 9 * 9 * INPUT_CHANNELS];
-    for (c, &feature) in position.features.iter().enumerate() {
-        assert!(c < INPUT_CHANNELS);
-        for i in 0..9 {
-            for j in 0..9 {
-                let pos = i * 9 + j;
-                if feature & (1 << pos) != 0 {
-                    features[9 * 9 * c + pos] = 1.0;
-                }
-            }
-        }
-    }
-    (features, position.move_label)
+    (unflatten(&position.features), position.move_label)
 }

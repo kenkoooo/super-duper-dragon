@@ -122,10 +122,10 @@ fn format_speed(iter_duration: Duration) -> String {
     let second = Duration::from_secs(1);
     if second > iter_duration {
         let iter_per_sec = second.as_secs_f64() / iter_duration.as_secs_f64();
-        format!("{:.2}s/it", iter_per_sec)
+        format!("{:.2}it/s", iter_per_sec)
     } else {
         let sec_per_iter = iter_duration.as_secs_f64() / second.as_secs_f64();
-        format!("{:.2}it/s", sec_per_iter)
+        format!("{:.2}s/it", sec_per_iter)
     }
 }
 

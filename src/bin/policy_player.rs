@@ -4,7 +4,7 @@ use shogiutil::{UsiRequest, UsiResponse};
 use super_duper_dragon::constants::INPUT_CHANNELS;
 use super_duper_dragon::network::policy::PolicyNetwork;
 use super_duper_dragon::usi::UsiPlayer;
-use super_duper_dragon::util::board_encoder::flatten;
+use super_duper_dragon::util::board_packer::flatten;
 use super_duper_dragon::util::make_output_label::make_output_label;
 use super_duper_dragon::util::CheckPoint;
 use tch::nn::{Module, VarStore};

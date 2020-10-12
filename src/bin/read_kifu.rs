@@ -1,15 +1,13 @@
 use anyhow::Result;
 use clap::Clap;
 use shogiutil::{parse_csa_string, Bitboard, Board, Color, Move, Piece, Square};
-use std::cmp::{max, min};
 use std::env;
 use std::fs::{read_to_string, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use super_duper_dragon::constants::{INPUT_CHANNELS, MOVE_DIRECTIONS};
-use super_duper_dragon::model::{MoveDirection, Position};
+use super_duper_dragon::model::Position;
 use super_duper_dragon::progressbar::ToProgressBar;
-use super_duper_dragon::util::board_encoder::BoardPacker;
+use super_duper_dragon::util::board_packer::BoardPacker;
 use super_duper_dragon::util::make_output_label::make_output_label;
 
 #[derive(Clap)]
@@ -33,7 +31,6 @@ fn read_single_kifu<P: AsRef<Path>>(filepath: P) -> Result<Vec<Position>> {
         } else {
             board.rotate180().encode()
         };
-        let is_winner_turn = mv.color == winner;
         let result = board.push_move(mv.clone())?;
         let move_label = if mv.color == Color::Black {
             make_output_label(&mv.from, &mv.to, mv.piece, result.promoted)
@@ -45,6 +42,8 @@ fn read_single_kifu<P: AsRef<Path>>(filepath: P) -> Result<Vec<Position>> {
                 result.promoted,
             )
         };
+
+        let is_winner_turn = mv.color == winner;
         data.push(Position {
             is_winner_turn,
             move_label,

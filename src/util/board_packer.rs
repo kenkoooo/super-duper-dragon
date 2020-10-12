@@ -1,5 +1,5 @@
 use crate::constants::INPUT_CHANNELS;
-use shogiutil::{Bitboard, Board, Color, Piece, Square};
+use shogiutil::{Bitboard, Board, Piece};
 
 pub trait BoardPacker {
     fn encode(&self) -> [u128; INPUT_CHANNELS];

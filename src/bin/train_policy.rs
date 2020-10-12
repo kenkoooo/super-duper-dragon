@@ -9,7 +9,7 @@ use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
 use super_duper_dragon::progressbar::ProgressBar;
-use super_duper_dragon::util::board_encoder::flatten;
+use super_duper_dragon::util::board_packer::ToFlatVec;
 use super_duper_dragon::util::{Accuracy, CheckPoint};
 use tch::kind::Kind::{Double, Int64};
 use tch::nn::{Module, OptimizerConfig, Sgd, VarStore};
@@ -28,6 +28,10 @@ struct Opts {
     train: String,
     #[clap(long)]
     test: String,
+    #[clap(short, long, default_value = "20")]
+    epoch: usize,
+    #[clap(short, long, default_value = "0.01")]
+    learning_rate: f64,
 }
 
 fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
@@ -57,8 +61,10 @@ fn main() -> Result<()> {
     let model = PolicyNetwork::new(&vs.root());
     vs.load_if_exists(&opts.save_file_path)?;
 
-    let mut optimizer = Sgd::default().build(&vs, 0.01)?;
-    for _ in 0..1 {
+    let mut optimizer = Sgd::default().build(&vs, opts.learning_rate)?;
+    for epoch in 0..opts.epoch {
+        log::info!("Start epoch {}", epoch);
+
         let mut sum_loss = 0.0;
         let mut iter = 0.0;
         let mut sum_loss_epoch = 0.0;
@@ -110,6 +116,6 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn position_to_features(position: &Position) -> (Vec<f32>, u8) {
-    (flatten(&position.features), position.move_label)
+fn position_to_features(position: &Position) -> (Vec<f32>, i16) {
+    (position.features.to_flat_vec(), position.move_label)
 }

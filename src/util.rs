@@ -1,9 +1,7 @@
-pub mod board_encoder;
+pub mod board_packer;
 pub mod make_output_label;
 
-use crate::constants::INPUT_CHANNELS;
 use anyhow::Result;
-use shogiutil::{Board, Piece, Square};
 use tch::kind::Kind::Double;
 use tch::nn::VarStore;
 use tch::Tensor;

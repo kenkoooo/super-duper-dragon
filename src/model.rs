@@ -70,7 +70,7 @@ impl MoveDirection {
 pub struct Position {
     pub features: Vec<u128>,
     pub is_winner_turn: bool,
-    pub move_label: u8,
+    pub move_label: i16,
 }
 
 #[cfg(test)]

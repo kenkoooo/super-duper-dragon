@@ -8,7 +8,7 @@ use super_duper_dragon::constants::INPUT_CHANNELS;
 use super_duper_dragon::data_loader::DataLoader;
 use super_duper_dragon::model::Position;
 use super_duper_dragon::network::policy::PolicyNetwork;
-use super_duper_dragon::progressbar::ProgressBar;
+use super_duper_dragon::progressbar::{ProgressBar, ToProgressBar};
 use super_duper_dragon::util::board_packer::ToFlatVec;
 use super_duper_dragon::util::{Accuracy, CheckPoint};
 use tch::kind::Kind::{Double, Int64};
@@ -71,7 +71,7 @@ fn main() -> Result<()> {
         let mut iter_epoch = 0.0;
 
         let train_loader = DataLoader::new(&train_kifu, position_to_features, batchsize);
-        for (x, t) in ProgressBar::new(train_loader, |state| log::info!("{}", state)) {
+        for (x, t) in train_loader.progress(|state| log::info!("{}", state)) {
             let x = x
                 .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
                 .to_device(vs.device());

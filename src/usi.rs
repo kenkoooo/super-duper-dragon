@@ -7,9 +7,10 @@ pub trait UsiPlayer {
     fn usi_play(&mut self) -> Result<()> {
         loop {
             let mut input = String::new();
-            stdin().read_to_string(&mut input)?;
+            stdin().read_line(&mut input)?;
+            log::info!("input: {}", input);
 
-            let responses = self.play(UsiRequest::parse(&input)?);
+            let responses = self.play(UsiRequest::parse(input.trim())?);
             for response in responses {
                 println!("{}", response.to_string());
             }

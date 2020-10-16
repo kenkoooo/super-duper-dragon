@@ -43,6 +43,29 @@ fn load_bin_file(filepath: &str) -> Result<Vec<Position>> {
     Ok(kifu)
 }
 
+fn validate(
+    test_kifu: &[Position],
+    batchsize: usize,
+    model: &PolicyNetwork,
+    device: Device,
+) -> f64 {
+    let mut accuracy = 0.0;
+    let mut iter = 0.0;
+    no_grad(|| {
+        let test_loader = DataLoader::new(test_kifu, position_to_features, batchsize);
+        for (x, t) in test_loader.progress(|state| log::info!("validation {}", state)) {
+            let x = x
+                .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
+                .to_device(device);
+            let t = t.to_device(device);
+            let y = model.forward(&x);
+            accuracy += y.accuracy(&t);
+            iter += 1.0;
+        }
+    });
+    accuracy / iter
+}
+
 fn main() -> Result<()> {
     env::set_var("RUST_LOG", "info");
     env_logger::init();
@@ -89,23 +112,15 @@ fn main() -> Result<()> {
 
             if iter as usize == opts.eval_interval {
                 vs.save(&opts.save_file_path)?;
-                no_grad(|| {
-                    test_kifu.shuffle(&mut rng);
-                    let mut test_loader =
-                        DataLoader::new(&test_kifu, position_to_features, batchsize);
-                    let (x, t) = test_loader.next().unwrap();
-                    let x = x
-                        .view((batchsize as i64, INPUT_CHANNELS as i64, 9, 9))
-                        .to_device(vs.device());
-                    let t = t.to_device(vs.device());
-                    let y = model.forward(&x);
-                    log::info!(
-                        "iter_epoch={} loss={} accuracy={}",
-                        iter_epoch,
-                        sum_loss / iter,
-                        y.accuracy(&t)
-                    );
-                });
+                test_kifu.shuffle(&mut rng);
+
+                let accuracy = validate(&test_kifu[0..batchsize], batchsize, &model, vs.device());
+                log::info!(
+                    "iter_epoch={} loss={} accuracy={}",
+                    iter_epoch,
+                    sum_loss / iter,
+                    accuracy
+                );
                 sum_loss = 0.0;
                 iter = 0.0;
             }

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Clap;
-use shogiutil::{parse_csa_string, Bitboard, Board, Color, Move, Piece, Square};
+use shogiutil::{parse_csa_string, Board, Color};
 use std::env;
 use std::fs::{read_to_string, File};
 use std::io::Write;

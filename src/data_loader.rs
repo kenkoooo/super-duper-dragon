@@ -27,7 +27,7 @@ where
 {
     type Item = (Tensor, Tensor);
     fn next(&mut self) -> Option<Self::Item> {
-        if (self.cur_position + 1) * self.batchsize >= self.data.len() {
+        if (self.cur_position + 1) * self.batchsize > self.data.len() {
             return None;
         }
         let mut data = vec![];

@@ -125,6 +125,14 @@ fn main() -> Result<()> {
                 iter = 0.0;
             }
         }
+
+        let accuracy = validate(&test_kifu, batchsize, &model, vs.device());
+        log::info!(
+            "epoch={} loss={} accuracy={}",
+            epoch,
+            sum_loss_epoch / iter_epoch,
+            accuracy
+        );
     }
 
     log::info!("Done");

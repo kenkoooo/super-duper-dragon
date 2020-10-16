@@ -111,7 +111,6 @@ fn main() -> Result<()> {
             iter_epoch += 1.0;
 
             if iter as usize == opts.eval_interval {
-                vs.save(&opts.save_file_path)?;
                 test_kifu.shuffle(&mut rng);
 
                 let accuracy = validate(&test_kifu[0..batchsize], batchsize, &model, vs.device());
@@ -133,6 +132,8 @@ fn main() -> Result<()> {
             sum_loss_epoch / iter_epoch,
             accuracy
         );
+        log::info!("saving ...");
+        vs.save(&opts.save_file_path)?;
     }
 
     log::info!("Done");

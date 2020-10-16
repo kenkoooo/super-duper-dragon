@@ -53,7 +53,7 @@ impl UsiPlayer for PolicyPlayer {
             UsiRequest::Go => {
                 let board = self.board.take().unwrap();
                 let next_turn = self.next_turn.take().unwrap();
-
+                log::info!("next_turn={:?}", next_turn);
                 let board = if next_turn == Color::Black {
                     board
                 } else {
